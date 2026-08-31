@@ -831,15 +831,14 @@
     <h2 id="modalTitle">Welcome back</h2>
     <p class="sub-text" id="modalSubtext">Login to track your progress & save results</p>
     <div id="errorMsg" class="error-msg"></div>
-    <div id="nameField" style="display:none;">
-      <label for="signupName">Your Name</label>
-      <input type="text" id="signupName" placeholder="e.g. Rahul Kumar" />
-    </div>
     <label for="loginEmail">Email Address</label>
     <input type="email" id="loginEmail" placeholder="your@email.com" />
     <label for="loginPassword">Password</label>
     <input type="password" id="loginPassword" placeholder="••••••••" />
-    
+    <div id="nameField" style="display:none;">
+      <label for="signupName">Your Name</label>
+      <input type="text" id="signupName" placeholder="e.g. Rahul Kumar" />
+    </div>
     <div class="modal-actions">
       <button class="btn-primary" id="modalActionBtn">Login</button>
       <button class="btn-secondary" id="modalToggleBtn">Create an account →</button>
@@ -1100,7 +1099,7 @@
       </div>
       <div class="footer-col">
         <a href="https://jac.jharkhand.gov.in/">JAC Board Portal</a>
-        <a href="help center.html">Help Center</a>
+        <a href="">Help Center</a>
       </div>
     </div>
     <div class="copyright">© 2026 Examora Education Platform. All rights reserved.</div>
@@ -1108,25 +1107,27 @@
 </footer>
 
 <script>
-  // Updated Firebase Config
+  // ============================================================
+  // FIREBASE CONFIGURATION (UPDATED)
+  // ============================================================
   const firebaseConfig = {
-    apiKey: "AIzaSyCSKGPYysrY_nenSiWd5zc_j63iKl5e4dI",
-    authDomain: "examora-2a41d.firebaseapp.com",
-    projectId: "examora-2a41d",
-    storageBucket: "examora-2a41d.firebasestorage.app",
-    messagingSenderId: "796425471402",
-    appId: "1:796425471402:web:4f2e0ff8f4c7388a6c97d3",
-    measurementId: "G-T4WDSYQZNJ"
+    apiKey: "AIzaSyBOBa3EiXkvqn-gHw9zRtGrbd5SncBML_o",
+    authDomain: "quizup2-d7891.firebaseapp.com",
+    projectId: "quizup2-d7891",
+    storageBucket: "quizup2-d7891.firebasestorage.app",
+    messagingSenderId: "472860125258",
+    appId: "1:472860125258:web:a5fb3960308b163e141eb3",
+    measurementId: "G-9RZSTY9R0P"
   };
 
   // Initialize Firebase
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
+  firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  // ============================================================
   // DOM REFERENCES
+  // ============================================================
   const loginBtn = document.getElementById('loginBtn');
   const modal = document.getElementById('loginModal');
   const modalClose = document.getElementById('modalClose');
@@ -1142,13 +1143,17 @@
   const nameField = document.getElementById('nameField');
   const errorMsg = document.getElementById('errorMsg');
   const progressContent = document.getElementById('progressContent');
+  const progressLoginTrigger = document.getElementById('progressLoginTrigger');
 
   let isLoginMode = true;
 
+  // ============================================================
   // UI HELPERS
+  // ============================================================
   function showError(msg) {
     errorMsg.textContent = msg;
     errorMsg.style.display = 'block';
+    setTimeout(() => { errorMsg.style.display = 'none'; }, 5000);
   }
   function clearError() {
     errorMsg.textContent = '';
@@ -1174,7 +1179,9 @@
     clearError();
   }
 
+  // ============================================================
   // PROGRESS DISPLAY
+  // ============================================================
   function displayProgress(user, name) {
     const userId = user.uid;
     db.collection('users').doc(userId).collection('tests').get()
@@ -1206,7 +1213,7 @@
             <div class="progress-card highlight">
               <div class="number">${totalTests}</div>
               <div class="label">Tests Completed</div>
-              <div class="sub-label">Keep going!</div>
+              <div class="sub-label">Keep going! </div>
             </div>
             <div class="progress-card">
               <div class="number">${accuracy}%</div>
@@ -1259,10 +1266,14 @@
     });
   }
 
+  // ============================================================
   // FIREBASE AUTH FUNCTIONS
+  // ============================================================
   function handleLogin(email, password) {
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .then(() => auth.signInWithEmailAndPassword(email, password))
+      .then(() => {
+        return auth.signInWithEmailAndPassword(email, password);
+      })
       .then((userCredential) => {
         const user = userCredential.user;
         db.collection('users').doc(user.uid).get()
@@ -1273,12 +1284,16 @@
             modal.classList.remove('active');
           });
       })
-      .catch((error) => showError(error.message));
+      .catch((error) => {
+        showError(error.message);
+      });
   }
 
   function handleSignup(email, password, name) {
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .then(() => auth.createUserWithEmailAndPassword(email, password))
+      .then(() => {
+        return auth.createUserWithEmailAndPassword(email, password);
+      })
       .then((userCredential) => {
         const user = userCredential.user;
         return db.collection('users').doc(user.uid).set({
@@ -1291,13 +1306,17 @@
           modal.classList.remove('active');
         });
       })
-      .catch((error) => showError(error.message));
+      .catch((error) => {
+        showError(error.message);
+      });
   }
 
   function handleGoogleSignIn() {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .then(() => auth.signInWithPopup(provider))
+      .then(() => {
+        return auth.signInWithPopup(provider);
+      })
       .then((result) => {
         const user = result.user;
         db.collection('users').doc(user.uid).get()
@@ -1315,21 +1334,33 @@
             modal.classList.remove('active');
           });
       })
-      .catch((error) => showError(error.message));
+      .catch((error) => {
+        showError(error.message);
+      });
   }
 
   function handleLogout() {
     auth.signOut().then(() => {
       updateUIAfterLogout();
       showGuestProgress();
-    }).catch((error) => showError('Logout failed: ' + error.message));
+    }).catch((error) => {
+      showError('Logout failed: ' + error.message);
+    });
   }
 
-  // UPDATE UI STATE
+  // ============================================================
+  // UPDATE UI BASED ON AUTH STATE
+  // ============================================================
   function updateUIAfterLogin(user, displayName) {
     const name = displayName || user.email;
     loginBtn.textContent = '👤 ' + name;
     loginBtn.classList.add('logged-in');
+    loginBtn.onclick = function(e) {
+      e.preventDefault();
+      if (confirm('Logout ' + name + ' ?')) {
+        handleLogout();
+      }
+    };
     sessionStorage.setItem('examora_user', name);
     sessionStorage.setItem('examora_email', user.email);
     sessionStorage.setItem('examora_uid', user.uid);
@@ -1338,12 +1369,19 @@
   function updateUIAfterLogout() {
     loginBtn.textContent = '🔑 Login';
     loginBtn.classList.remove('logged-in');
+    loginBtn.onclick = function(e) {
+      e.preventDefault();
+      modal.classList.add('active');
+      setLoginMode();
+    };
     sessionStorage.removeItem('examora_user');
     sessionStorage.removeItem('examora_email');
     sessionStorage.removeItem('examora_uid');
   }
 
+  // ============================================================
   // CHECK AUTH STATE ON LOAD
+  // ============================================================
   auth.onAuthStateChanged((user) => {
     if (user) {
       db.collection('users').doc(user.uid).get()
@@ -1362,16 +1400,12 @@
     }
   });
 
-  // NAV BUTTON EVENT HANDLER
+  // ============================================================
+  // MODAL EVENTS
+  // ============================================================
   loginBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    const currentUser = auth.currentUser;
-    if (currentUser) {
-      const name = sessionStorage.getItem('examora_user') || currentUser.email;
-      if (confirm('Logout ' + name + ' ?')) {
-        handleLogout();
-      }
-    } else {
+    if (!auth.currentUser) {
+      e.preventDefault();
       modal.classList.add('active');
       setLoginMode();
       loginEmail.value = '';
@@ -1380,7 +1414,6 @@
     }
   });
 
-  // MODAL EVENTS
   modalClose.addEventListener('click', function() { modal.classList.remove('active'); });
   modal.addEventListener('click', function(e) {
     if (e.target === modal) modal.classList.remove('active');
@@ -1389,18 +1422,19 @@
   modalToggleBtn.addEventListener('click', function() {
     if (isLoginMode) setSignupMode();
     else setLoginMode();
+    clearError();
   });
 
   modalActionBtn.addEventListener('click', function() {
     const email = loginEmail.value.trim();
     const password = loginPassword.value.trim();
     const name = signupName.value.trim();
-    if (!isLoginMode && !name) {
-      showError('Please enter your name.');
-      return;
-    }
     if (!email || !password) {
       showError('Please enter email and password.');
+      return;
+    }
+    if (!isLoginMode && !name) {
+      showError('Please enter your name.');
       return;
     }
     clearError();
@@ -1408,7 +1442,9 @@
     else handleSignup(email, password, name);
   });
 
-  googleSignInBtn.addEventListener('click', handleGoogleSignIn);
+  googleSignInBtn.addEventListener('click', function() {
+    handleGoogleSignIn();
+  });
 
   modalSkipBtn.addEventListener('click', function() {
     modal.classList.remove('active');
@@ -1416,36 +1452,34 @@
     showGuestProgress();
   });
 
-  // KEYBOARD NAVIGATION FIX
-  signupName.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      loginEmail.focus();
-    }
-  });
-
   loginEmail.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
       e.preventDefault();
-      loginPassword.focus();
+      if (!isLoginMode && !signupName.value) signupName.focus();
+      else modalActionBtn.click();
     }
   });
-
   loginPassword.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
       e.preventDefault();
-      modalActionBtn.click();
+      if (!isLoginMode && !signupName.value) signupName.focus();
+      else modalActionBtn.click();
     }
+  });
+  signupName.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') modalActionBtn.click();
   });
 
   document.addEventListener('click', function(e) {
-    if (e.target.id === 'progressLoginTrigger') {
+    if (e.target.id === 'progressLoginTrigger' || e.target.id === 'progressLoginTrigger2') {
       modal.classList.add('active');
       setLoginMode();
     }
   });
 
+  // ============================================================
   // MOBILE MENU
+  // ============================================================
   const mobileBtn = document.getElementById('mobileMenuBtn');
   const navLinksEl = document.getElementById('navLinks');
   if (mobileBtn && navLinksEl) {
@@ -1460,7 +1494,9 @@
     });
   }
 
+  // ============================================================
   // HERO SLIDER
+  // ============================================================
   const track = document.getElementById('heroTrack');
   const slides = track.querySelectorAll('.hero-slide');
   const totalSlides = slides.length;
